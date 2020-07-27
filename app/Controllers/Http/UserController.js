@@ -3,9 +3,6 @@
 
 const User = use('App/Models/User')
 class UserController {
-    //TODO: summernote
-
-
     async login({ auth, request, response, session }) {
         const email = request.input('email')
         const password = request.input('password')
@@ -42,6 +39,23 @@ class UserController {
         await user.save()
 
         response.send(user)
+    }
+
+    async createDummy({ auth, request, response }) {
+
+
+        const lastUser = await User.last()
+
+        const id = lastUser.id + 1
+
+        const user = new User()
+        user.username = 'user' + id
+        user.email = 'user' + id + '@mail.com'
+        user.password = 'user' + id
+        await user.save()
+
+        return user
+
     }
 }
 

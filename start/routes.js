@@ -63,6 +63,7 @@ Route.group(() => {
     Route.post('/login', 'UserController.login').as('login')
     Route.post('/register', 'UserController.register')
     Route.get('/logout', 'UserController.logout')
+    Route.get('/dummy', 'UserController.createDummy')
 }).prefix('user')
 
 
