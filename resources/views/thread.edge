@@ -1,0 +1,263 @@
+@layout('layout.master')
+
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        @yield('title')
+            <title>Thread</title> 
+        @endyield
+    </head>
+
+    <body>
+        @section('content')
+        @if(getErrorFor('prohibited') != null)
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            {{getErrorFor('prohibited')}}
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        @endif
+        <div class="container-fluid" style="width:100%" style="background-color:aqua">
+            <div class="row" style="margin-top:20px">
+                <div class="card border-primary" style="border-width:3px;width:12%;height:10%">
+                    <div class="card-body">
+                        <div class="row" style="width:100%">
+                            <div class="col-sm" style="width:30%">
+                                <h6 class="card-title">{{user.username}}</h6>
+                            </div>
+                            <h6 class="card-title">{{user.point}}</h6>
+                        </div>
+                    </div> 
+                    
+                    <img src="{{assetsUrl('no-image.png')}}"
+                    width="100%" />
+                </div>
+                
+                <div class="card text-white bg-primary" style="margin-left:1%;width:86%">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-xl-10">
+                                <h5 class="card-title">{{thread.title}}</h5>
+                            </div>
+                            @if(auth.user.id == thread.user_id)   
+                            <div class="col-xl-2">
+                                <button class="btn card-title pull-right" id="deleteThread" data-toggle="modal" data-target="#deleteModal">
+                                    <a class="card-title pull-right" style="margin-left:10px;color:red">
+                                        <span class="fa fa-trash"></span>
+                                    </a>
+                                </button>
+                                <button class="btn card-title pull-right" >
+                                    <a class="card-title pull-right" style="color:yellow" href="/thread/{{thread.id}}/edit">
+                                        <span class="fa fa-pencil"></span>
+                                    </a>
+                                </button>
+                            </div>
+                            
+                            @endif
+                        </div>
+                        <hr>
+                        <p class="card-text">{{{thread.content}}}</p>
+                    </div>
+{{--  
+                    @if(auth.user.id != thread.user_id || auth.user == null)
+                    <div class="row" style="margin-left:10px">
+                        <div class="col-xl-0" style="margin-right:10px">
+                            <a href="#">
+                                <span class="fa fa-arrow-up"></span>
+                            </a>
+                        </div>
+                        <div class="col-xl-0" style="margin-right:10px">
+                            <p>0</p>
+                        </div>      
+                        <div class="col-xl-0">
+                            <a href="#">
+                                <span class="fa fa-arrow-down"></span>
+                            </a>
+                        </div>
+                    </div>
+                    @endif
+                      --}}
+                </div>
+            </div>
+            <hr>
+
+            {{--  comment  --}}
+            @each(comment in comments)
+            <div class="row" style="margin-top:20px">
+                <div class="card border-success" style="border-width:3px;width:12%;height:10%">
+                    
+                    <div class="card-body">
+                        <div class="row" style="width:100%">
+                            <div class="col-sm" style="width:30%">
+                                <h6 class="card-title"> {{ comment.username }}</h6>
+                            </div>
+                            <h6 class="card-title"> {{ comment.point }}</h6>
+                        </div>
+                    </div> 
+                    
+                    <img src="{{assetsUrl('no-image.png')}}"
+                    width="100%" />
+                </div>
+                
+                <div class="card border-success" style="border-width:3px;margin-left:1%;width:86%">
+                    <div class="card-body">
+                        <p class="card-text" id="{{'comment'+comment.cid}}">{{{comment.content}}}</p>
+                        <form action="/comment/{{comment.cid}}?_method=PUT" method="POST">
+                            {{ csrfField() }}
+                            <textarea id="{{'editComment'+comment.cid}}" name="content" class="form-control" 
+                                style="height:150px"type="text" required hidden>{{comment.content}}</textarea>
+                            <br>    
+                            <button type="submit" id="{{'submitEdit'+comment.cid}}" class="btn btn-success pull-right" hidden>Edit Komentar</button>
+                        </form>
+                    </div>
+                    <div class="row" style="margin-left:10px">
+                        @if(auth.user.id != comment.id)
+{{--                          
+                        <div class="col-xl-0" style="margin-right:10px">
+                            <a href="#">
+                                <span class="fa fa-arrow-up"></span>
+                            </a>
+                        </div>
+                        <div class="col-xl-0" style="margin-right:10px">
+                            <p>0</p>
+                        </div>      
+                        <div class="col-xl-0">
+                            <a href="#">
+                                <span class="fa fa-arrow-down"></span>
+                            </a>
+                        </div>
+                          --}}
+                        @else
+                        <div class="col-xl-12">
+                            <button class="btn card-title pull-right" id="{{'deleteButton'+comment.cid}}" data-target="#deleteModal" data-toggle="modal">
+                                <a class="card-title pull-right" style="margin-left:10px;color:red">
+                                    <span class="fa fa-trash"></span>
+                                </a>
+                            </button>
+                            <button class="btn card-title pull-right" id="{{'editButton'+comment.cid}}">
+                                <a class="card-title pull-right" style="color:yellow">
+                                    <span class="fa fa-pencil"></span>
+                                </a>
+                            </button>
+                        </div>
+                        @endif
+                    </div>
+                </div>
+
+            </div>
+            @endeach
+
+            <br>
+            <form action="/comment" method="POST">
+                {{ csrfField() }}
+                <input name="thread_id" class="form-control idThread" type="text" hidden>
+                <textarea id="summernote" name="content" class="form-control" id="textComment" style="height:150px"type="text" required hidden></textarea>
+                <br>
+                <button type="submit" id="submitComment" class="btn btn-success pull-right" hidden>Kirim Komentar</button>
+                @if(auth.user != null)
+                <button type="button" id="addComment" class="btn btn-primary pull-right">Tambah Komentar</button>
+                @else
+                <button type="button" class="btn btn-primary pull-right" data-toggle="modal"
+                data-target="#loginModal">Tambah Komentar</button>
+                @endif
+            </form>
+            <div class="row" style="margin-top:50px; margin-bottom:100px">
+                <div class="col-sm-12 text-center" style="width:100%">
+                    @if(page > 1)
+                    <button type="button" class="btn btn-primary">
+                        <a href="/thread/{{tId}}?page={{page - 1}}">
+                            <span class="fa fa-arrow-left" style="color:white"></span>
+                        </a>
+                    </button>
+                    @endif
+                    @if(page < lastPage)
+                    <button type="button"  class="btn btn-primary" style="margin-left:10px">
+                        <a href="/thread/{{tId}}?page={{page + 1}}">
+                            <span class="fa fa-arrow-right" style="color:white"></span>
+                        </a>
+                    </button>
+                    @endif
+                </div>
+            </div>
+        </div>
+        <div class="modal" id="deleteModal" tabindex="-1" role="dialog">
+            <div class="modal-dialog" role="document">
+              <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Login</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form action="" method="post"  id="deleteForm" enctype="multipart/form-data">
+                    {{csrfField()}}
+                    <div class="modal-body">
+                       Apa anda yakin ingin menghapus data?
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-danger">Hapus</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+                    </div>
+                </form>
+              </div>
+            </div>
+        </div>
+        @endsection
+        
+        
+    </body>
+
+    @section('script')
+    <script>
+
+        const url = location.href
+        const index = url.lastIndexOf('/')
+        const id = url.substring(index + 1)
+
+
+        $('#deleteThread').click(function(){
+            $('#deleteForm').attr('action',"/thread/" + id + "?_method=DELETE")
+        })
+
+        $('#addComment').click(function(){
+            $('.idThread').attr('value',id)
+            $('#textComment').removeAttr('hidden')
+            $('#submitComment').removeAttr('hidden')
+            $('#addComment').attr('hidden',true)  
+            $('#summernote').summernote();
+        })
+
+        var cid
+        if({{cId.length}} == 1){
+            cid = {{cId}}
+            $('#editButton' + cid).click(function(){
+                $('#editComment' + cid).removeAttr('hidden')
+                $('#editComment' + cid).summernote()
+                $('#submitEdit' + cid).removeAttr('hidden')          
+
+            })
+
+            $('#deleteButton' + cid).click(function(){
+                $('#deleteForm').attr('action',"/comment/" + cid + "?_method=DELETE")
+            })
+
+        } else {
+            cid = new Array({{cId}})
+            for(let i = 0; i < cid.length;i++){
+                $('#editButton' + cid[i]).click(function(){
+                    $('#editComment' + cid[i]).removeAttr('hidden')
+                    $('#editComment' + cid[i]).summernote()
+                    $('#submitEdit' + cid[i]).removeAttr('hidden')            
+                })
+
+                
+                $('#deleteButton' + cid[i]).click(function(){
+                    $('#deleteForm').attr('action',"/comment/" + cid[i] + "?_method=DELETE")
+                })
+            }
+        }
+     </script>
+    @endsection 
+</html>

@@ -1,0 +1,137 @@
+@layout('layout.master')
+
+<!DOCTYPE html>
+<html lang="en">
+    
+  
+
+<head>
+    @yield('title')
+        <title>Home Page</title> 
+    @endyield
+</head>
+
+@section('style')
+<style>
+    .threads:hover{
+        background-color: aquamarine
+    }
+</style>
+@endsection
+<body>
+    @section('content')
+    @if(getErrorFor('failed') != null)
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        {{getErrorFor('failed')}}
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    @endif
+    
+    @if(getErrorFor('auth') != null)
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        {{getErrorFor('auth')}}
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+    </div>
+    @endif
+    <div class="container-fluid" style="width:100%" style="background-color:aqua">
+        <br>
+        <div class="row justify-content-md-center">
+            <form action="/search" method="GET">
+                <div class="form-row">
+                    <div class="form-group col-md-10">
+                        <input class="form-control input-group-lg" name="keyword" placeholder="Cari Thread">
+                    </div>
+                    <div class="form-group col-md-2">
+                        <button type="submit" class="btn btn-outline-primary"><span class="fa fa-search"></span></button>
+                    </div>
+                </div>
+            </form>
+            <div class="col-sm-4">
+                @if(auth.user != null)
+                <a href="/create" type="button" class="btn btn-primary">Buat Thread</a>
+                @else
+                <button type="button" class="btn btn-primary" data-toggle="modal" 
+                data-target="#loginModal">Buat Thread</button>
+                @endif
+            </div>
+        </div>
+        <br>
+        {{--  {{threads}}  --}}
+        @each(thread in threads)
+        <div class="row" style="margin-top:20px">
+            <div class="card border-primary" style="border-width:3px;width:12%">
+                    <div class="card-body">
+                        <div class="row" style="width:100%">
+                            <div class="col-sm" style="width:30%">
+                                <h6 class="card-title">{{thread.username}}</h6>
+                            </div>
+                            <h6 class="card-title">{{thread.upoint}}</h6>
+                        </div>
+                    </div> 
+                    
+                    <img src="{{assetsUrl('no-image.png')}}"
+                    width="100%" />
+                </div>
+            <div class="card border-primary threads" id="{{'thread'+thread.id}}" 
+            style="border-width:3px;margin-left:1%;width:86%;cursor:pointer">
+                <div class="card-body">
+                    <h1 class="card-title">{{thread.title}}</h1>
+                    <p class="card-text">{{thread.content}}</p>
+                </div>
+            </div>
+        </div>
+        @endeach
+
+        <div class="row" style="margin-top:50px; margin-bottom:100px">
+            <div class="col-sm-12 text-center" style="width:100%">
+                @if(page > 1)
+                <button type="button" class="btn btn-primary">
+                    <a href="/?page={{page - 1}}">
+                        <span class="fa fa-arrow-left" style="color:white"></span>
+                    </a>
+                </button>
+                @endif
+                @if(page < lastPage)
+                <button type="button"  class="btn btn-primary" style="margin-left:10px">
+                    <a href="/?page={{page + 1}}">
+                        <span class="fa fa-arrow-right" style="color:white"></span>
+                    </a>
+                </button>
+                @endif
+            </div>
+        </div>
+    </div>
+    @endsection
+    @section('script')
+    <script type="text/javascript">
+
+        console.log({{maxPage}})
+        var id
+        if({{ids.length}} == 1){
+            id = {{ids}}
+            $('#thread' + id).click(function(){
+                    location.href = '/thread/' + id
+                })
+        } else {
+            id = new Array({{ids}})
+            for(let i = 0; i < id.length;i++){
+                $('#thread' + id[i]).click(function(){
+                    location.href = '/thread/' + id[i]
+                })
+            }
+        }
+  
+        
+     </script>
+    @endsection 
+
+</body>
+</html>
+
+
+
+

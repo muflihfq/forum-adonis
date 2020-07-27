@@ -1,0 +1,34 @@
+@layout('layout.master')
+
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        @yield('title')
+            <title>Edit Thread</title> 
+        @endyield
+    </head>
+
+    <body>
+        @section('content')
+        <form action="/thread/{{thread.id}}?_method=PUT" method="POST" enctype="multipart/form-data">
+            {{ csrfField() }}
+
+            <div class="modal-body">
+                <div class="modal-body">
+                <div class="form-group">
+                    <label>Judul</label>
+                    <input type="text" value="{{thread.title}}" name="title" class="form-control" id="" aria-describedby="" value="{{old('title')}}" required>
+                </div>
+                <div class="form-group">
+                    <label>Konten</label>
+                    <textarea name="content" class="form-control" style="height:250px" required>{{thread.content}}</textarea>
+                </div>
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary">Edit Thread</button>
+                </div>
+            </div>
+        </form>
+        @endsection
+    </body>
+</html>
