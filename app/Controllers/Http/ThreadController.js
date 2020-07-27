@@ -56,7 +56,7 @@ class ThreadController {
             .innerJoin('threads as t', 't.id', 'c.thread_id')
             .innerJoin('users as u', 'u.id', 'c.user_id')
             .where('t.id', params.id)
-            .paginate(page)
+            .paginate(page, 10)
 
         var cId = []
         const ids = await Database.select('c.id')

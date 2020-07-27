@@ -31,7 +31,7 @@ Route.get('/', async({ view, request }) => {
             't.id', 't.title', 't.content')
         .from('users as u')
         .innerJoin('threads as t', 'u.id', 't.user_id')
-        .paginate(page)
+        .paginate(page, 10)
 
 
 
