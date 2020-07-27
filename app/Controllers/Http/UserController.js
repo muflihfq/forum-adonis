@@ -46,9 +46,13 @@ class UserController {
 
         const lastUser = await User.last()
 
-        const id = lastUser.id + 1
-
         const user = new User()
+
+        let id = 1
+        if (lastUser != null) {
+            id = lastUser.id + 1
+        }
+
         user.username = 'user' + id
         user.email = 'user' + id + '@mail.com'
         user.password = 'user' + id
